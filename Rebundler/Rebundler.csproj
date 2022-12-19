@@ -1,9 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>Rebundler</Title>
+    <Description>Rebundler</Description>
+    <Company>Rans4ckeR</Company>
+    <Product>Rans4ckeR</Product>
+    <Copyright>Copyright © Rans4ckeR 2022</Copyright>
+    <Trademark>Copyright © Rans4ckeR 2022</Trademark>
+    <AssemblyName>Rebundler</AssemblyName>
+    <RootNamespace>Rebundler</RootNamespace>
+    <ComVisible>false</ComVisible>
+    <CLSCompliant>false</CLSCompliant>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <ComVisible>false</ComVisible>
+    <CLSCompliant>false</CLSCompliant>
+    <Platform>AnyCPU</Platform>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="apphost.exe" />

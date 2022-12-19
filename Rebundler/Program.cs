@@ -17,6 +17,12 @@ internal static partial class Program
     [SupportedOSPlatform("windows5.0")]
     private static async Task Main(string[] args)
     {
+        if (args.Length != 2)
+        {
+            Console.Write("Example usage: Rebundler application.exe icon.ico");
+            Environment.Exit(0);
+        }
+
         string exeFilePath = args[0];
         string iconFilePath = args[1];
         var loadedPackage = LoadedPackage.FromBundle(exeFilePath);
@@ -27,7 +33,7 @@ internal static partial class Program
         Directory.CreateDirectory(workingDirectory);
         await ExtractPackageEntries(workingDirectory, packageEntries).ConfigureAwait(false);
 
-        string assemblyDllName = packageEntries.Single(q => q.Name.EndsWith(".dll")).Name;
+        string assemblyDllName = packageEntries.Single(q => q.Name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)).Name;
 
         await UpdateIcons(workingDirectory, iconFilePath, assemblyDllName).ConfigureAwait(false);
 
