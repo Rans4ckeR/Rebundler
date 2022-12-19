@@ -9,7 +9,7 @@
     <None Remove="apphost.exe" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="apphost.exe" />
+    <EmbeddedResource Include="Resources\apphost.exe" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ICSharpCode.ILSpyX" Version="8.0.0.7246-preview3" />

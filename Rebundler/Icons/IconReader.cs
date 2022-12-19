@@ -1,13 +1,11 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-internal sealed class IconReader
+﻿internal sealed class IconReader
 {
     public readonly Icons Icons = new();
 
     public IconReader(Stream input)
     {
         using BinaryReader reader = new(input);
+
         reader.ReadUInt16(); // ignore. Should be 0
 
         ushort type = reader.ReadUInt16();
