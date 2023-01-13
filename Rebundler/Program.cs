@@ -12,7 +12,7 @@ internal static partial class Program
 {
     private const uint RT_ICON = 3;
     private const uint RT_GROUP_ICON = 14;
-    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x86\7.0.1\runtimes\win-x86\native\apphost.exe
+    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x86\7.0.2\runtimes\win-x86\native\apphost.exe
 
     [SupportedOSPlatform("windows5.0")]
     private static async Task Main(string[] args)
