@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Rebundler": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\RansAckeR\\source\\repos\\dta-mg-client-launcher\\bin\\Release\\net7.0-windows\\win-x86\\publish\\DTALauncherStub.exe\" \"C:\\temp\\cnc new deploy\\RA2MD.ico\""
-    }
-  }
-}
