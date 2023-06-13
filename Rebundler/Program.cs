@@ -4,7 +4,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Windows.Win32;
-using Windows.Win32.System.LibraryLoader;
+using Windows.Win32.Foundation;
 using ICSharpCode.ILSpyX;
 using Microsoft.NET.HostModel.AppHost;
 using Microsoft.NET.HostModel.Bundle;
@@ -13,7 +13,7 @@ internal static partial class Program
 {
     private const uint RT_ICON = 3;
     private const uint RT_GROUP_ICON = 14;
-    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-<architecture>\7.0.5\runtimes\win-<architecture>\native\apphost.exe
+    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-<architecture>\7.0.7\runtimes\win-<architecture>\native\apphost.exe
 
     [SupportedOSPlatform("windows5.0")]
     private static async Task Main(string[] args)
@@ -139,7 +139,7 @@ internal static partial class Program
     [SupportedOSPlatform("windows5.0")]
     private static async ValueTask ChangeIconAsync(string exeFilePath, Icons icons)
     {
-        UPDATERESOURCE_HANDLE handleExe = PInvoke.BeginUpdateResource(exeFilePath, false);
+        HANDLE handleExe = PInvoke.BeginUpdateResource(exeFilePath, false);
 
         if (handleExe.IsNull)
             throw new();

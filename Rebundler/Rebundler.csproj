@@ -30,8 +30,11 @@
     <EmbeddedResource Include="Resources\X86\apphost.exe" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ICSharpCode.ILSpyX" Version="8.0.0.7313-preview4" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.206-beta">
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ICSharpCode.ILSpyX" Version="8.0.0.7345" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.2-beta">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
