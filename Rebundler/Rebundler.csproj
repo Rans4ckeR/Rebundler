@@ -8,8 +8,8 @@
     <Description>Rebundler</Description>
     <Company>Rans4ckeR</Company>
     <Product>Rans4ckeR</Product>
-    <Copyright>Copyright © Rans4ckeR 2022</Copyright>
-    <Trademark>Copyright © Rans4ckeR 2022</Trademark>
+    <Copyright>Copyright © Rans4ckeR 2023</Copyright>
+    <Trademark>Copyright © Rans4ckeR 2023</Trademark>
     <AssemblyName>Rebundler</AssemblyName>
     <RootNamespace>Rebundler</RootNamespace>
     <ComVisible>false</ComVisible>
@@ -21,9 +21,6 @@
     <Platform>AnyCPU</Platform>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="apphost.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\X64\apphost.exe" />
     <EmbeddedResource Include="Resources\Arm64\apphost.exe" />
     <EmbeddedResource Include="Resources\Arm\apphost.exe" />
@@ -34,7 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ICSharpCode.ILSpyX" Version="8.0.0.7345" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.2-beta">
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.18-beta">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
