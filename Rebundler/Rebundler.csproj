@@ -30,8 +30,8 @@
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ICSharpCode.ILSpyX" Version="8.0.0.7345" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.18-beta">
+    <PackageReference Include="ICSharpCode.ILSpyX" Version="8.2.0.7535" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
