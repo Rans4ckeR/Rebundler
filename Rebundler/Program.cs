@@ -13,7 +13,7 @@ internal static partial class Program
 {
     private const uint RT_ICON = 3;
     private const uint RT_GROUP_ICON = 14;
-    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-<architecture>\7.0.14\runtimes\win-<architecture>\native\apphost.exe
+    private const string APP_HOST_TEMPLATE = "apphost.exe"; // Copied from C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-<architecture>\<dotnet version>\runtimes\win-<architecture>\native\apphost.exe
 
     [SupportedOSPlatform("windows5.0")]
     private static async Task Main(string[] args)
@@ -29,23 +29,30 @@ internal static partial class Program
         LoadedPackage? loadedPackage = LoadedPackage.FromBundle(exeFilePath);
         var packageEntries = loadedPackage!.Entries;
         string currentDirectory = Path.GetDirectoryName(exeFilePath)!;
+
+        if (string.IsNullOrWhiteSpace(currentDirectory))
+            currentDirectory = Directory.GetCurrentDirectory();
+
         string workingDirectory = $"{currentDirectory}\\out";
+
+        if (Directory.Exists(workingDirectory))
+            Directory.Delete(workingDirectory, true);
 
         Directory.CreateDirectory(workingDirectory);
         await ExtractPackageEntriesAsync(workingDirectory, packageEntries).ConfigureAwait(false);
 
-        string assemblyDllName = packageEntries.Single(q => q.Name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)).Name;
+        string assemblyDllName = packageEntries.Single(q => q.Name.EndsWith(".deps.json", StringComparison.OrdinalIgnoreCase)).Name.Replace(".deps.json", ".dll", StringComparison.OrdinalIgnoreCase);
+        string targetFramework = GetAssemblyTargetFramework($"{workingDirectory}\\{assemblyDllName}");
         Architecture architecture;
-        var fs = new FileStream(exeFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        var assemblyFileStream = new FileStream(exeFilePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-        await using (fs.ConfigureAwait(false))
+        await using (assemblyFileStream.ConfigureAwait(false))
         {
-            using var peReader = new PEReader(fs);
+            using var peReader = new PEReader(assemblyFileStream);
 
             architecture = peReader.PEHeaders.CoffHeader.Machine switch
             {
                 Machine.I386 => Architecture.X86,
-                Machine.Arm => Architecture.Arm,
                 Machine.Amd64 => Architecture.X64,
                 Machine.Arm64 => Architecture.Arm64,
                 _ => throw new ArgumentOutOfRangeException(nameof(Machine), peReader.PEHeaders.CoffHeader.Machine.ToString(), null)
@@ -54,16 +61,30 @@ internal static partial class Program
 
         await UpdateIconsAsync(workingDirectory, iconFilePath, assemblyDllName).ConfigureAwait(false);
 
-        string appHostTemplateFilePath = await ExtractAppHostTemplateAsync(workingDirectory, architecture).ConfigureAwait(false);
+        string appHostTemplateFilePath = await ExtractAppHostTemplateAsync(workingDirectory, targetFramework, architecture).ConfigureAwait(false);
         string assemblyExeName = $"{Path.GetFileNameWithoutExtension(assemblyDllName)}.exe";
-        string newAssemblyExeFilePath = $"{currentDirectory}\\out\\{assemblyExeName}";
+        string newAssemblyExeFilePath = $@"{currentDirectory}\out\{assemblyExeName}";
 
         CreateAppHost(workingDirectory, assemblyDllName, newAssemblyExeFilePath, appHostTemplateFilePath);
 
         string bundle = CreateBundle(workingDirectory, assemblyExeName, packageEntries);
 
-        File.Move(bundle, $"{currentDirectory}\\New{assemblyExeName}");
+        File.Move(bundle, $"{currentDirectory}\\New{assemblyExeName}", true);
         Directory.Delete(workingDirectory, true);
+    }
+
+    private static string GetAssemblyTargetFramework(string assemblyPath)
+    {
+        List<string> assemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll").ToList();
+
+        assemblies.Add(assemblyPath);
+
+        var resolver = new PathAssemblyResolver(assemblies);
+        using var metadataLoadContext = new MetadataLoadContext(resolver);
+        Assembly assembly = metadataLoadContext.LoadFromAssemblyPath(assemblyPath);
+        string targetFrameworkName = (string)assembly.GetCustomAttributesData().Single(q => q.AttributeType.FullName!.Equals(typeof(TargetFrameworkAttribute).FullName, StringComparison.OrdinalIgnoreCase)).ConstructorArguments.Single().Value!;
+
+        return targetFrameworkName[(targetFrameworkName.IndexOf("Version=", StringComparison.OrdinalIgnoreCase) + "Version=".Length)..];
     }
 
     private static string CreateBundle(string workingDirectory, string assemblyExeName, IEnumerable<PackageEntry> packageEntries)
@@ -87,12 +108,12 @@ internal static partial class Program
             $"{workingDirectory}\\{assemblyDllName}");
     }
 
-    private static async ValueTask<string> ExtractAppHostTemplateAsync(string workingDirectory, Architecture architecture)
+    private static async ValueTask<string> ExtractAppHostTemplateAsync(string workingDirectory, string targetFramework, Architecture architecture)
     {
         var assembly = Assembly.GetAssembly(typeof(Program));
-        Stream appHostTemplateStream = assembly!.GetManifestResourceStream($"Rebundler.Resources.{architecture}.{APP_HOST_TEMPLATE}")!;
+        Stream appHostTemplateStream = assembly!.GetManifestResourceStream($"Rebundler.Resources.{targetFramework.Replace(".", "._", StringComparison.OrdinalIgnoreCase)}.{architecture}.{APP_HOST_TEMPLATE}")!;
         string appHostTemplateFilePath = $"{workingDirectory}\\{APP_HOST_TEMPLATE}";
-        FileStream appHostFileStream = File.Create(appHostTemplateFilePath);
+        var appHostFileStream = new FileStream(appHostTemplateFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
 
         await using (appHostTemplateStream.ConfigureAwait(false))
         {
@@ -108,11 +129,11 @@ internal static partial class Program
     [SupportedOSPlatform("windows5.0")]
     private static async ValueTask UpdateIconsAsync(string workingDirectory, string iconFilePath, string assemblyName)
     {
-        FileStream fs = File.OpenRead(iconFilePath);
+        var iconFileStream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-        await using (fs.ConfigureAwait(false))
+        await using (iconFileStream.ConfigureAwait(false))
         {
-            var reader = new IconReader(fs);
+            var reader = new IconReader(iconFileStream);
 
             await ChangeIconAsync($"{workingDirectory}\\{assemblyName}", reader.Icons).ConfigureAwait(false);
         }
@@ -122,15 +143,15 @@ internal static partial class Program
     {
         foreach (PackageEntry packageEntry in packageEntries)
         {
-            Stream? stream = packageEntry.TryOpenStream();
+            Stream? packageStream = packageEntry.TryOpenStream();
 
-            await using (stream!.ConfigureAwait(false))
+            await using (packageStream!.ConfigureAwait(false))
             {
-                FileStream fileStream = File.Create($"{workingDirectory}\\{packageEntry.Name}");
+                var fileStream = new FileStream($"{workingDirectory}\\{packageEntry.Name}", FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
 
                 await using (fileStream.ConfigureAwait(false))
                 {
-                    await stream!.CopyToAsync(fileStream).ConfigureAwait(false);
+                    await packageStream!.CopyToAsync(fileStream).ConfigureAwait(false);
                 }
             }
         }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>Rebundler</Title>
@@ -16,15 +16,18 @@
     <CLSCompliant>false</CLSCompliant>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <ComVisible>false</ComVisible>
     <CLSCompliant>false</CLSCompliant>
     <Platform>AnyCPU</Platform>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\X64\apphost.exe" />
-    <EmbeddedResource Include="Resources\Arm64\apphost.exe" />
-    <EmbeddedResource Include="Resources\Arm\apphost.exe" />
-    <EmbeddedResource Include="Resources\X86\apphost.exe" />
+    <EmbeddedResource Include="Resources\v8.0\Arm64\apphost.exe" />
+    <EmbeddedResource Include="Resources\v8.0\X64\apphost.exe" />
+    <EmbeddedResource Include="Resources\v8.0\X86\apphost.exe" />
+    <EmbeddedResource Include="Resources\v7.0\Arm64\apphost.exe" />
+    <EmbeddedResource Include="Resources\v7.0\X64\apphost.exe" />
+    <EmbeddedResource Include="Resources\v7.0\X86\apphost.exe" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -35,6 +38,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.NET.HostModel\Microsoft.NET.HostModel.csproj" />
